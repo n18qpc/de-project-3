@@ -20,6 +20,7 @@ from airflow.operators.dummy import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.task_group import TaskGroup
+from airflow.models import Variable
 
 os.chdir('/lessons/')
 pg_conn = BaseHook.get_connection('pg_conn')
@@ -77,8 +78,10 @@ def get_report_request(url, business_dt, ti, headers):
 
 
 def get_files_from_s3(business_dt,s3_conn, ti):
+    cohort = Variable.get("cohort")
+    nickname = Variable.get("nickname")
     report_id = str(ti.xcom_pull(task_ids='create_files_request.get_report_request', key='report_id'))
-    url = f'https://storage.yandexcloud.net/s3-sprint3/cohort_1/egorovmaksim14/project/{report_id}/'
+    url = f'https://storage.yandexcloud.net/s3-sprint3/{cohort}/{nickname}/project/{report_id}/'
     for filename in ['customer_research','user_orders_log','user_activity_log']:
         local_filename = '/lessons/' + business_dt.replace('-','') + '_' + filename + '.csv'
         url_file = url+filename+'.csv'
