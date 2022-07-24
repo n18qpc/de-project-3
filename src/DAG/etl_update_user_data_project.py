@@ -229,6 +229,12 @@ get_files_inc_task = PythonOperator(
         dag = dag
 )        
 
+drop_duplicates = PostgresOperator(
+        task_id="drop_duplicates",
+        postgres_conn_id = "pg_conn",
+        sql = "sql/drop_duplicates.sql",
+        dag=dag
+)
 
 with TaskGroup("delete_group", dag=dag) as delete_group:
     sql="DELETE FROM {{ params.table }} WHERE date_time = '" + business_dt + "'"
@@ -325,5 +331,5 @@ end = DummyOperator(task_id="end",
 
 create_files_request >> delay_bash_task >> get_files_task >> branch_task1 
 branch_task1 >> [dummy1, get_files_inc_task] 
-get_files_inc_task >> delete_group >> load_inc_group >> rows_check_task >> update_mart 
+get_files_inc_task >> delete_group >> load_inc_group >> drop_duplicates >> rows_check_task >> update_mart 
 [dummy1, update_mart] >> end

@@ -132,13 +132,13 @@ create_checks = PostgresOperator(
         task_id="create_checks",
         postgres_conn_id= "pg_conn",
         sql='sql/stage1_1_staging_create_check.sql',
-        dag=dag)        
+        dag=dag)
 
 update_status = PostgresOperator(
         task_id="update_status",
         postgres_conn_id= "pg_conn",
         sql='sql/stage1_staging_mart_alter.sql',
-        dag=dag)    
+        dag=dag)
 
 
 with TaskGroup("create_files_request", dag=dag) as create_files_request:
@@ -177,6 +177,13 @@ with TaskGroup("load_csv_group", dag=dag) as load_csv_group:
             'conn_args': pg_conn},
             dag=dag))
     l
+
+drop_duplicates = PostgresOperator(
+        task_id="drop_duplicates",
+        postgres_conn_id = "pg_conn",
+        sql = "sql/drop_duplicates.sql",
+        dag=dag
+)
 
 update_dimensions = PostgresOperator(
         task_id="update_dimensions",
