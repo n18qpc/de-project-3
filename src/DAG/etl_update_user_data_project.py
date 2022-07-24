@@ -122,7 +122,7 @@ def get_files_inc(business_dt, ti):
             url_file = s3_path[filename]
             print(url_file)
             df = pd.read_csv(url_file, index_col=0)
-            df = df.drop_duplicates()
+            #df = df.drop_duplicates()
             if 'id' in df.columns:
                 df = df.drop('id', axis=1)
             if filename == 'user_orders_log_inc' and 'status' not in df.columns:
